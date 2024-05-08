@@ -271,6 +271,18 @@ const removeStudentAttendance = async (req, res) => {
     }
 };
 
+// Fetch all student IDs
+ const getAllStudentIds = async (req, res) => {
+    try {
+        const students = await Student.find().select('_id');  // Only selects the '_id' field
+        res.json(students);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching student IDs", error: error });
+    }
+};
+
+
+
 
 module.exports = {
     studentRegister,
@@ -283,7 +295,8 @@ module.exports = {
     studentAttendance,
     deleteStudentsByClass,
     updateExamResult,
-
+    getAllStudentIds,
+    
     clearAllStudentsAttendanceBySubject,
     clearAllStudentsAttendance,
     removeStudentAttendanceBySubject,

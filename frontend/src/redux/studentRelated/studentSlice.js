@@ -12,6 +12,12 @@ const studentSlice = createSlice({
     name: 'student',
     initialState,
     reducers: {
+
+        getFeesSuccess: (state, action) => {
+            state.fees = action.payload;
+            state.loading = false;
+            state.error = null;
+        },
         getRequest: (state) => {
             state.loading = true;
         },
@@ -45,8 +51,11 @@ const studentSlice = createSlice({
     },
 });
 
+
+
 export const {
     getRequest,
+    getFeesSuccess,
     getSuccess,
     getFailed,
     getError,

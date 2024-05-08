@@ -12,6 +12,7 @@ const StudentProfile = () => {
   const sclassName = currentUser.sclassName
   const studentSchool = currentUser.school
 
+  console.log(currentUser._id, "currentUser");
   return (
     <>
       <Container maxWidth="md">
