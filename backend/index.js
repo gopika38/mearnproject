@@ -7,9 +7,9 @@ const app = express();
 const Routes = require("./routes/route.js");
 const generateFees = require('./utils/generateFees');  // Ensure this path is correctly pointing to your fee generation utility
 
-const PORT = process.env.PORT || 5000;
-
 dotenv.config();
+
+const PORT = process.env.PORT || 5000;
 
 // Middleware setup
 app.use(express.json({ limit: '10mb' }));
@@ -21,8 +21,18 @@ mongoose
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-    .then(() => console.log("Connected to MongoDB"))
+    .then(() => {
+        console.log("Connected to MongoDB");
+        // Run the fee generation function immediately after connecting to MongoDB
+        generateFees();
+    })
+    
     .catch((err) => console.log("NOT CONNECTED TO NETWORK", err));
+
+// Ensure models are loaded before routes
+require('./models/studentSchema');
+require('./models/invoiceSchema');
+require('./models/feeSchema');
 
 // API Routes
 app.use('/', Routes);
@@ -31,6 +41,7 @@ app.use('/', Routes);
 app.get('/', (req, res) => {
     res.send('<h1>Server started and waiting for the client request!!!</h1>');
 });
+
 
 // Cron job for fee generation, scheduled at the beginning of each month at midnight, IST
 cron.schedule('0 0 1 * *', () => {

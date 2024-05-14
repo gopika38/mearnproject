@@ -1,4 +1,6 @@
-import { Container, Grid, Paper } from '@mui/material'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Container, Grid, Paper } from '@mui/material';
 import SeeNotice from '../../components/SeeNotice';
 import Students from "../../assets/img1.png";
 import Classes from "../../assets/img2.png";
@@ -7,22 +9,38 @@ import Fees from "../../assets/img4.png";
 import styled from 'styled-components';
 import CountUp from 'react-countup';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
 import { getAllSclasses } from '../../redux/sclassRelated/sclassHandle';
 import { getAllStudents } from '../../redux/studentRelated/studentHandle';
 import { getAllTeachers } from '../../redux/teacherRelated/teacherHandle';
 
 const AdminHomePage = () => {
     const dispatch = useDispatch();
+    const [totalFees, setTotalFees] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
     const { studentsList } = useSelector((state) => state.student);
     const { sclassesList } = useSelector((state) => state.sclass);
     const { teachersList } = useSelector((state) => state.teacher);
 
-    const { currentUser } = useSelector(state => state.user)
+    const { currentUser } = useSelector(state => state.user);
 
-    const adminID = currentUser._id
+    const adminID = currentUser._id;
 
     useEffect(() => {
+        const fetchTotalFees = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/totalCollected`);
+                setTotalFees(response.data.totalCollected);
+            } catch (error) {
+                setError(error.response ? error.response.data.message : error.message);
+            }
+            setLoading(false);
+        };
+
+        fetchTotalFees();
         dispatch(getAllStudents(adminID));
         dispatch(getAllSclasses(adminID, "Sclass"));
         dispatch(getAllTeachers(adminID));
@@ -39,37 +57,34 @@ const AdminHomePage = () => {
                     <Grid item xs={12} md={3} lg={3}>
                         <StyledPaper>
                             <img src={Students} alt="Students" />
-                            <Title>
-                                Total Students
-                            </Title>
+                            <Title>Total Students</Title>
                             <Data start={0} end={numberOfStudents} duration={2.5} />
                         </StyledPaper>
                     </Grid>
                     <Grid item xs={12} md={3} lg={3}>
                         <StyledPaper>
                             <img src={Classes} alt="Classes" />
-                            <Title>
-                                Total Classes
-                            </Title>
+                            <Title>Total Classes</Title>
                             <Data start={0} end={numberOfClasses} duration={5} />
                         </StyledPaper>
                     </Grid>
                     <Grid item xs={12} md={3} lg={3}>
                         <StyledPaper>
                             <img src={Teachers} alt="Teachers" />
-                            <Title>
-                                Total Teachers
-                            </Title>
+                            <Title>Total Teachers</Title>
                             <Data start={0} end={numberOfTeachers} duration={2.5} />
                         </StyledPaper>
                     </Grid>
                     <Grid item xs={12} md={3} lg={3}>
                         <StyledPaper>
                             <img src={Fees} alt="Fees" />
-                            <Title>
-                                Fees Collection
-                            </Title>
-                            <Data start={0} end={23000} duration={2.5} prefix="$" />                        </StyledPaper>
+                            <Title>Fees Collection</Title>
+                            {!loading && !error && (
+                                <Data start={0} end={totalFees} duration={2.5} prefix="$" />
+                            )}
+                            {loading && <p>Loading...</p>}
+                            {error && <p>Error: {error}</p>}
+                        </StyledPaper>
                     </Grid>
                     <Grid item xs={12} md={12} lg={12}>
                         <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
@@ -81,7 +96,6 @@ const AdminHomePage = () => {
         </>
     );
 };
-
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -102,4 +116,4 @@ const Data = styled(CountUp)`
   color: green;
 `;
 
-export default AdminHomePage
+export default AdminHomePage;

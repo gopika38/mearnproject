@@ -24,6 +24,8 @@ const { subjectCreate, classSubjects, deleteSubjectsByClass, getSubjectDetail, d
 const { teacherRegister, teacherLogIn, getTeachers, getTeacherDetail, deleteTeachers, deleteTeachersByClass, deleteTeacher, updateTeacherSubject, teacherAttendance } = require('../controllers/teacher-controller.js');
 const { payFee  } = require('../controllers/feeController');  // Import the fee controller
 const feeController = require('../controllers/feeController');
+const { getInvoicePDF } = require('../controllers/invoiceController');
+const invoiceController = require('../controllers/invoiceController');
 
 
 // Admin routes
@@ -90,8 +92,14 @@ router.delete("/SubjectsClass/:id", deleteSubjectsByClass);
 // Fee routes
 router.post('/PayFee/:feeId', payFee); // Adding the payFee route
 router.get('/fees/:studentId', feeController.getFeesByStudentId);
+router.get('/invoices/:studentId', feeController.getInvoicesByStudentId);
 // Route to get all student IDs
 router.get('/AllStudentIds', require('../controllers/student_controller').getAllStudentIds);
+router.get('/download/:invoiceId', getInvoicePDF);
+// Admin routes
+
+router.get('/invoices', invoiceController.getAllInvoices); // Get all invoices
+router.get('/totalCollected', invoiceController.getTotalCollected); // Get total collected
 
 
 
